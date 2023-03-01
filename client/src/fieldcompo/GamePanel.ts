@@ -149,7 +149,7 @@ export class GamePanel{
         this.asset.setCollisions();
         this.asset.setDoor();
         
-        this.socket.emit("oi", this.input)
+        // this.socket.emit("oi", this.input)
         
         this.status = JSON.parse(getItemFromLocalState("persist:root").userStatusReducer)
         

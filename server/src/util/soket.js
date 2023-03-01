@@ -1,7 +1,7 @@
 module.exports = (http)=>{
     const soketIO = require("socket.io")(http, {
         cors:{
-            origin: "https://node-final-option3.vercel.app"
+            origin: "http://localhost:5173"
         }
     })
 

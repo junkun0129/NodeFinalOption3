@@ -16,6 +16,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "../server/src/util/soket.js"],
+  "include": ["src", "../server/src/util/soket.js", "vite-env.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

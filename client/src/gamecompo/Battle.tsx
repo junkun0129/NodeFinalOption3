@@ -232,13 +232,8 @@ function Battle({socket}:socketType) {
         <>
             
             
-            <motion.div className={styles.battleBox} 
-                variants = {variant}
-                transition = {{delay:2, duration:2}}
-                animate = {backScreen?"back":isEncount?"show":"hidden"}
-                
-                >
-                
+            
+               
 
                     <motion.div 
                         transition = {sceneState===enemiesTurnScene?{
@@ -250,7 +245,7 @@ function Battle({socket}:socketType) {
                         className={styles.innnerBattleBox}>
 
                         <div className={styles.enemeyField}>
-                            <motion.div className={styles.fieldEach} 
+                            {/* <motion.div className={styles.fieldEach} 
                                 animate={enemy1Selector.hp<=0?{opacity:0}:{opacity:1}}
                                 transition={{}}
                             >
@@ -337,7 +332,8 @@ function Battle({socket}:socketType) {
                                 </motion.div>
                                 
                             
-                            </motion.div>
+                            </motion.div> */}
+                            
                         </div>
                         
                         <div style={{display:"flex", justifyContent:"center", zIndex:3}}
@@ -378,7 +374,7 @@ function Battle({socket}:socketType) {
                     <button onClick={(e)=>{createEnemyDispatch(maketozero3())}}>;alskj</button>
                     </motion.div>
                     
-            </motion.div>
+            
             
             {/* <motion.div drag className={styles.you}>
                 <h1>oi</h1>

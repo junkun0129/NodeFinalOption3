@@ -29,12 +29,12 @@ function Field({socket}:socketType) {
         game?.setup();
     }, [game])
 
-    useEffect(()=>{
-        socket.on("screenSwitch", (data)=>{
-            setIsEncount(true)
-            console.log("entounttttttttttt")
-          })
-    },[socket])
+    // useEffect(()=>{
+    //     socket.on("screenSwitch", (data)=>{
+    //         setIsEncount(true)
+    //         console.log("entounttttttttttt")
+    //       })
+    // },[socket])
 
    const encount = {
     none:{},
@@ -50,11 +50,11 @@ function Field({socket}:socketType) {
     return ( 
         <>
             <motion.canvas className={styles.field} ref = {canvasRef} width = {window.innerWidth} height={window.innerHeight}
-                variants = {encount}
-                animate = {isEncount?"dissapiar":"none"}
-                transition = {{
-                    duration:2
-                }}
+                // variants = {encount}
+                // animate = {isEncount?"dissapiar":"none"}
+                // transition = {{
+                //     duration:2
+                // }}
             ></motion.canvas>  
         </>
      );

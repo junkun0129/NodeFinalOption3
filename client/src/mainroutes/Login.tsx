@@ -18,7 +18,7 @@ function Login() {
         setIsSubmit(true);
         setError("");
         console.log({email, password}, "this is it")
-        fetch("https://node-final-project3-server.vercel.app/auth/signin", {
+        fetch("http://localhost:8080/auth/signin", {
             method:"POST",
             body: JSON.stringify({email, password}),
             headers: {"Content-Type":"application/json"}
@@ -31,7 +31,7 @@ function Login() {
             }else{
                 console.log(response.ok)
                 const data = await response.json()
-                console.log(data)
+                console.log(data, "this is data")
                 userStatusDispach(createUser({
                     userId:data.userId,
                     email:data.email,

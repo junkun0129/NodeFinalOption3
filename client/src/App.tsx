@@ -9,6 +9,7 @@ import Game from './mainroutes/Game'
 import Signup from './mainroutes/Signup'
 import Login from './mainroutes/Login'
 import Home from './mainroutes/Home'
+import env from 'ts-react-dotenv'
 export interface ServerToClientEvents {
   screenSwitch:(hit:string)=>void;
   backSwitch:(backback:string)=>void;
@@ -20,7 +21,9 @@ export interface ClientToServerEvents {
   encount:(encount:string)=>void;
   back:(backback:string)=>void;
 }
-const socket:Socket<ServerToClientEvents, ClientToServerEvents>= io("https://node-final-project3-server.vercel.app")
+// const url:string = process.env.SERVER_URL; 
+
+const socket:Socket<ServerToClientEvents, ClientToServerEvents>= io("http://localhost:8080")
 
 function App() {
   const [count, setCount] = useState(0)

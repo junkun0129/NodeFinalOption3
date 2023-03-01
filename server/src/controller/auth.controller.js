@@ -16,7 +16,7 @@ const signInController = async(req, res, next)=>{
     const {email, password} = req.body;
     const signInService = await signIn(email, password);
     
-    // console.log(signInService)
+    console.log(signInService)
     return res.json(signInService);
 }
 
