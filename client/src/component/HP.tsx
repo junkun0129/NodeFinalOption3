@@ -2,9 +2,10 @@ import * as React from 'react';
 import { Component } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import { useEffect, useState } from 'react';
-import { useMotionValue,useMotionValueEvent,useMotionTemplate, useTransform, motion, MotionValue, animate } from 'framer-motion';
+import { useMotionValue,useMotionValueEvent,useMotionTemplate, useTransform, motion, MotionValue, animate, useAnimationControls } from 'framer-motion';
 import {star} from "../gamecompo/SvgPath"
 import { atackEnemy1, atackEnemy2, atackEnemy3 } from '../store/features/enemySlice';
+import { useNonInitialEffect } from '../customhooks/useNonInitialEffect';
 
 type dialogType = {
     dialog:string,
@@ -14,9 +15,10 @@ type dialogType = {
     dragState:(i:number)=>void,
     enemyDragState:(i:number)=>void,
     childSceneState:(s:number)=>void,
-    startover:number
+    startover:number,
+    enemyAttackNum:(n:number)=>void
 }
-function HP({dialog, sceneState, dragX, dragY, dragState, enemyDragState, childSceneState,startover}:dialogType) {
+function HP({dialog, sceneState, dragX, dragY, dragState, enemyDragState, childSceneState,startover, enemyAttackNum}:dialogType) {
 
     
     const hp = useAppSelector(state=>state.reducer.userStatusReducer.status.hp)
@@ -33,6 +35,7 @@ function HP({dialog, sceneState, dragX, dragY, dragState, enemyDragState, childS
     const dragEndX= useMotionValue(0);
     const dragEndY = useMotionValue(0);
     const [causeRender, setCauseRender] = useState(""); 
+    const [enemyAttacknum, setEnemyAttacknum] = useState(0);
     const normalMode = 0;
     const attackMode = 1;
     const shieldMode = 2;
@@ -47,7 +50,8 @@ function HP({dialog, sceneState, dragX, dragY, dragState, enemyDragState, childS
     let X = useMotionValue(0);
     let Y = useMotionValue(0);
 
-    const rote = useMotionValue(0);
+    let [clicked, setClicked] = useState(0);
+    // const rote = useMotionValue(0);
 
     
     const [ishenge, setIshenge] = useState(false);
@@ -61,18 +65,32 @@ function HP({dialog, sceneState, dragX, dragY, dragState, enemyDragState, childS
     //     maxhp = hp;
     // },[])
 
+    useNonInitialEffect(()=>{
+        console.log("droped")
+    },[dragEndPosition])
+
+    //mouse end position
     useMotionValueEvent(dragEndX||dragEndY, "change",()=>{
-        if(dragEndY.get()<400){
+        if(dragEndY.get()<100){
             
             if(dragEndX.get()<400){
+                // dispatch(atackEnemy1({atack:playerAT}))
                 setDragEndPosition(enemy1Position);
-                dispatch(atackEnemy1({atack:playerAT}))
+                enemyAttackNum(0)
+                setEnemyAttacknum(0)
+                childSceneState(3)
             }else if(400<dragEndX.get()&&dragEndX.get()<1000){
+                // dispatch(atackEnemy2({atack:playerAT}))
                 setDragEndPosition(enemy2Position)
-                dispatch(atackEnemy2({atack:playerAT}))
+                enemyAttackNum(1)
+                setEnemyAttacknum(1)
+                childSceneState(3)
             }else{
+                // dispatch(atackEnemy3({atack:playerAT}))
                 setDragEndPosition(enemy3Position);
-                dispatch(atackEnemy3({atack:playerAT}))
+                enemyAttackNum(2)
+                setEnemyAttacknum(2)
+                childSceneState(3)
             }
         }else{
             setDragEndPosition(noenemyposition)
@@ -81,6 +99,7 @@ function HP({dialog, sceneState, dragX, dragY, dragState, enemyDragState, childS
 
     })
 
+    //mouse move position
     useMotionValueEvent(X||Y,"change", ()=>{
         if(Y.get()<400){
             setDragStatus(attackMode)
@@ -113,36 +132,130 @@ function HP({dialog, sceneState, dragX, dragY, dragState, enemyDragState, childS
         dragState(dragStatus)
     },[dragStatus])
 
-    let positions = useMotionValue("relative");
-    let toppn = useMotionValue(1);
-    let [kk, setKk] = useState(1)
-    let [jj, setJj] = useState(1);
-    useMotionValueEvent(rote, "animationComplete", ()=>{
-        if(kk===1){
-        console.log("anime ends ")
-            childSceneState(3)
-            setKk(2);
-            setJj(3)
-        }
-        
-    })
+    const attackAnimeControl = useAnimationControls()
 
-    useMotionValueEvent(toppn, "animationComplete", ()=>{
-        if(jj>2){
-            console.log("jumbiii")
+    useNonInitialEffect(()=>{
+        console.log("clicked")
+            attackAnimeControl.start({
+                width:200,
+                height:200,
+                borderRadius:"100px",
+                border:"solid 6px white",
+            })
+        
+    },[sceneState===2])
+
+    useNonInitialEffect(()=>{
+        attackAnimeControl.start({
+            width:"100%",
+            height:"240px"
+        })
+    },[sceneState===4])
+   
+    useNonInitialEffect(()=>{
+
+        attackAnimeControl.start({
+            
+            x:[-400,-400,-700,-700,0],
+            y:[-400,-400,-100,-100,0],
+            rotate:[20,-20,-20,0,0],
+            
+        }).then(()=>{
+
+            console.log("apsodfijas;dfoj")
+            if(enemyAttacknum===0){
+                dispatch(atackEnemy1({atack:playerAT}))
+            }else if(enemyAttacknum===1){
+                dispatch(atackEnemy2({atack:playerAT}))
+            }else if(enemyAttacknum===2){
+                dispatch(atackEnemy3({atack:playerAT}))
+            }
+        }).then(()=>{
+            // attackAnimeControl.start({
+            //     width:"100%",
+            //     height:"240px"
+            // })
+            console.log("whole world")
+            setDragStatus(0);
             childSceneState(4)
-        }
+        })
+        // .then(()=>{
+
+        // })
         
-    })
+    },[dragEndPosition])
 
-    useEffect(()=>{
-        setDragStatus(0)
-        setDragEndPosition(0)
-    },[startover===1])
+    useNonInitialEffect(()=>{
+        switch(dragStatus){
+            case itemMode:
+                attackAnimeControl.start({
+                    width:300,
+                    height:230,
+                    borderRadius: "121px 0px 200px 0px",
+                    border:"solid 6px white",
+                })
+                break;
+            case shieldMode:
+                attackAnimeControl.start({
+                    width:250,
+                    height:230,
+                    borderRadius:"0px 0px 200px 200px",
+                    border:"solid 6px white"
+                })
+                break;
+            case attackMode:
+                attackAnimeControl.start({
+                    width:50,
+                    height:250,
+                    borderRadius:"200px 200px 0px 0px",
+                    border:"solid 6px white",
+                })
+                break;
+            default:
+                attackAnimeControl.start({
+                    width:200,
+                    height:200,
+                    borderRadius:"100px",
+                    border:"solid 6px white",
+                })
+        }
+    },[dragStatus])
+
+    console.log(dragEndPosition, ";lkj")
+
+
+
+    
+    // let positions = useMotionValue("relative");
+    // let toppn = useMotionValue(1);
+    // let [kk, setKk] = useState(1)
+    // let [jj, setJj] = useState(1);
+    // useMotionValueEvent(rote, "animationComplete", ()=>{
+    //     if(kk===1){
+    //     console.log("anime ends ")
+    //         childSceneState(3)
+    //         setKk(2);
+    //         setJj(3)
+    //     }
+        
+    // })
+
+    // useMotionValueEvent(toppn, "animationComplete", ()=>{
+    //     if(jj>2){
+    //         console.log("jumbiii")
+    //         childSceneState(4)
+    //     }
+        
+    // })
+
+    // useEffect(()=>{
+    //     setDragStatus(0)
+    //     setDragEndPosition(0)
+    // },[startover===1])
 
     
     
-    console.log(dragEndPosition, "dragendposition")
+    // console.log(dragEndPosition, "dragendposition")
     return ( 
         <>
             <motion.div 
@@ -153,6 +266,7 @@ function HP({dialog, sceneState, dragX, dragY, dragState, enemyDragState, childS
                 onDragEnd={(e, i)=>{
                     dragEndX.set(i.point.x)
                     dragEndY.set(i.point.y)
+                    setDragStatus(0)
                 }}
                 onDrag = {(event, info)=>{
                     // console.log(info.point.x, info.point.y)
@@ -162,67 +276,14 @@ function HP({dialog, sceneState, dragX, dragY, dragState, enemyDragState, childS
                     Y.set(info.point.y)
                     
                 }}
+                onClick={()=>setClicked(clicked++)}
+                animate={attackAnimeControl}
                 
-                animate = {sceneState===4?{
-                    marginTop:0,position:"relative",width:"100%", height:"240px", border:"10px solid white",borderRadius:"20px", boxSizing:"border-box", background: `linear-gradient(to left, black ${(1-hp/mxHp)*100}%, lime ${(1-hp/mxHp)*100}% ${hp/mxHp*100}%)`
-                }:sceneState === 3?{
-                    marginTop:0,position:"relative",width:"100%", height:"240px", border:"10px solid white",borderRadius:"20px", boxSizing:"border-box", background: `linear-gradient(to left, black ${(1-hp/mxHp)*100}%, lime ${(1-hp/mxHp)*100}% ${hp/mxHp*100}%)`
-                }:dragEndPosition === enemy1Position?{
-                    width:50,
-                    height:250,
-                    borderRadius:"200px 200px 0px 0px",
-                    border:"solid 6px white",
-                    color: "red",
-                    x:[-400,-400,-700,-700,0],
-                    y:[-400,-400,-100,-100,0],
-                    rotate:[20,-20,-20,0,0]
-                }:dragEndPosition === enemy2Position?{
-                    width:50,
-                    height:250,
-                    borderRadius:"200px 200px 0px 0px",
-                    border:"solid 6px white",
-                    color: "red",
-                    x:[200,200,-100,-100,0],
-                    y:[-400,-400,-100,-100,0],
-                    rotate:[20,-20,-20,0,0]
-                }:dragEndPosition === enemy3Position?{
-                    width:50,
-                    height:250,
-                    borderRadius:"200px 200px 0px 0px",
-                    border:"solid 6px white",
-                    color: "red",
-                    x:[600,600,200,200,0],
-                    y:[-400,-400,-100,-100,0],
-                    rotate:[20,-20,-20,0,0]
-                }:sceneState === 2 && dragStatus === attackMode?{
-                    width:50,
-                    height:250,
-                    borderRadius:"200px 200px 0px 0px",
-                    border:"solid 6px white",
-                    color: "red"
-                }:sceneState === 2 && dragStatus===shieldMode?{
-                    width:250,
-                    height:230,
-                    borderRadius:"0px 0px 200px 200px",
-                    border:"solid 6px white"
-                }:sceneState === 2 && dragStatus === itemMode?{
-                    width:300,
-                    height:230,
-                    borderRadius: "121px 0px 200px 0px",
-                    border:"solid 6px white",
-                    
-                }:sceneState === 2 &&{
-                    width:200,
-                    height:200,
-                    borderRadius:"100px",
-                    border:"solid 6px white",
-                    
-                }}
+                // transition={dragEndPosition === enemy1Position || dragEndPosition === enemy2Position || dragEndPosition === enemy3Position
+                // ?{duration:2, times:[0,0.3,0.4,0.8,1]}
+                // :{duration:1,stiffness:50,damping:10, type:"spring"}}
+                style={{position:"relative",width:"100%", height:"240px", border:"10px solid white",borderRadius:"20px", boxSizing:"border-box", background: `linear-gradient(to left, black ${(1-hp/mxHp)*100}%, lime ${(1-hp/mxHp)*100}% ${hp/mxHp*100}%)`}}>
                 
-                transition={dragEndPosition === enemy1Position || dragEndPosition === enemy2Position || dragEndPosition === enemy3Position
-                ?{duration:2, times:[0,0.3,0.4,0.8,1]}
-                :{duration:1,stiffness:50,damping:10, type:"spring"}}
-                style={{ marginTop:toppn,rotate:rote,position:positions,width:"100%", height:"240px", border:"10px solid white",borderRadius:"20px", boxSizing:"border-box", background: `linear-gradient(to left, black ${(1-hp/mxHp)*100}%, lime ${(1-hp/mxHp)*100}% ${hp/mxHp*100}%)`}}>
 
                 {/* <motion.div style={{width:`${HpTranform}%`, height:"100%",backgroundColor:"lime"}}
                             transition={{duration:1,stiffness:50,damping:10, type:"spring"}}

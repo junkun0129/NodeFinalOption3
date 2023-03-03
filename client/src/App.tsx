@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 //import './App.css'
 import {BrowserRouter, Route, Routes} from "react-router-dom"
@@ -10,6 +10,8 @@ import Signup from './mainroutes/Signup'
 import Login from './mainroutes/Login'
 import Home from './mainroutes/Home'
 import env from 'ts-react-dotenv'
+import { useNonInitialEffect } from './customhooks/useNonInitialEffect'
+
 export interface ServerToClientEvents {
   screenSwitch:(hit:string)=>void;
   backSwitch:(backback:string)=>void;
@@ -26,9 +28,7 @@ export interface ClientToServerEvents {
 const socket:Socket<ServerToClientEvents, ClientToServerEvents>= io("http://localhost:8080")
 
 function App() {
-  const [count, setCount] = useState(0)
   
-
   
   return (
    <>
@@ -40,6 +40,8 @@ function App() {
         <Route path = "/login" element = {<Login></Login>}></Route>
       </Routes>
     </BrowserRouter>
+
+      
    </>
   )
 }

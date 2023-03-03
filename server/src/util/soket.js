@@ -14,12 +14,19 @@ module.exports = (http)=>{
 
         socket.on("encount", (data)=>{
             
-            socket.emit("screenSwitch", "hit");
+            if(data === "hit"){
+
+                socket.emit("screenSwitch", "hit");
+            }
             
         })
 
         socket.on("back", (data)=>{
-            socket.emit("backSwitch", "backback")
+            if(data=="backback"){
+
+                socket.emit("backSwitch", "backback")
+                console.log("kaettekitaOoo")
+            }
         })
 
 

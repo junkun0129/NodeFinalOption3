@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Component } from 'react';
 import styles from "./Battle.module.scss";
-import {motion, MotionValue, motionValue, useMotionValue, useMotionValueEvent, useTransform} from "framer-motion"
+import {motion, MotionValue, motionValue, useAnimationControls, useMotionValue, useMotionValueEvent, useTransform} from "framer-motion"
 import { socketType } from './Field';
 import { useState, useEffect } from 'react';
 import Genkiman from '../enemycompo/Genkiman';
@@ -11,19 +11,23 @@ import HP from '../component/HP';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import { maketozero1,maketozero2,maketozero3,atackEnemy1, atackEnemy2, atackEnemy3, createEnemy1, createEnemy2, createEnemy3 } from '../store/features/enemySlice';
 import {restoreHP,getAttackFromEnemy} from "../store/features/userStatuSlice"
+import {enemyStatusType} from "../store/features/enemySlice"
+import { useNonInitialEffect } from '../customhooks/useNonInitialEffect';
 
 export type enemeyStatusType = {
     hp:number,
     at:number
 }
 function Battle({socket}:socketType) {
-    const [isEncount, setIsEncount] = useState<boolean>(false);
+    // const [isEncount, setIsEncount] = useState<boolean>(false);
     const [enemyDragState, setEnemyDragState] = useState(0);
-    const enemy1position = 1;
-    const enemy2position = 2;
-    const enemy3position = 3
+    // const enemy1position = 1;
+    // const enemy2position = 2;
+    // const enemy3position = 3
 
-    const [backScreen, setBackScreen] = useState(false);
+    // const [backScreen, setBackScreen] = useState(false);
+
+    const [whichEnemyAt, setWhichEnemyAt] = useState(0)
 
     const battleOffScene = 0;
     const appearedScene = 1
@@ -43,54 +47,51 @@ function Battle({socket}:socketType) {
     const enemy1Selector = useAppSelector(state=>state.reducer.enemy1Reducer)
     const enemy2Selector = useAppSelector(state=>state.reducer.enemy2Reducer)
     const enemy3Selector = useAppSelector(state=>state.reducer.enemy3Reducer)
-    const userselector = useAppSelector(state=>state.reducer.userStatusReducer)
-    let [enemy1max, setEnemy1max]= useState(0)
-    let [enemy2max, setEnemy2max]= useState(0)
-    let [enemy3max, setEnemy3max]= useState(0)
 
-    const [enemy1at, setEnemy1at] = useState(false)
-    const [enemy2at, setEnemy2at] = useState(false)
-    const [enemy3at, setEnemy3at] = useState(false)
+    const enemySelectors = [enemy1Selector, enemy2Selector, enemy3Selector]
+    const enemyDispatches= [
+        (e:enemyStatusType)=>createEnemyDispatch(createEnemy1(e)),
+        (e:enemyStatusType)=>createEnemyDispatch(createEnemy2(e)),
+        (e:enemyStatusType)=>createEnemyDispatch(createEnemy3(e)),
+    ]
+    
+    const userAt = useAppSelector(state=>state.reducer.userStatusReducer.status.at)
+
+    // let [enemy1max, setEnemy1max]= useState(0)
+    // let [enemy2max, setEnemy2max]= useState(0)
+    // let [enemy3max, setEnemy3max]= useState(0)
+
+    // const [enemy1at, setEnemy1at] = useState(false)
+    // const [enemy2at, setEnemy2at] = useState(false)
+    // const [enemy3at, setEnemy3at] = useState(false)
+
+    // const enemies:Array<JSX.Element> = [];
 
     const [dialog, setDialog] = useState<string>("");
-
-    // const [dragX, setDragX] = useState<number>(0)
-    // const [dragY, setDragY] = useState<number>(0)
     let dragX = useMotionValue(0);
     let dragY = useMotionValue(0)
 
 
     
     const [drag, setDrag]= useState(0);
-    const [enemy1, setEnemy1] = useState<JSX.Element[]|null>(null)
-    const [enemy2, setEnemy2] = useState<JSX.Element[]|null>(null)
-    const [enemy3, setEnemy3] = useState<JSX.Element[]|null>(null)
-    const enemyhp1:MotionValue = motionValue(enemy1Selector.hp) 
-    const enemyhp2:MotionValue = motionValue(enemy2Selector.hp) 
-    const enemyhp3:MotionValue = motionValue(enemy3Selector.hp) 
-    // const restHP1:MotionValue<number> = useTransform(enemyhp1,[0,enemy1max], [0,100])
-    // const restHP2:MotionValue<number> = useTransform(enemyhp2,[0,enemy2max], [0,100])
-    // const restHP3:MotionValue<number> = useTransform(enemyhp3,[0,enemy3max], [0,100])
-    // const lostHP1:MotionValue<number> = useTransform(enemyhp1, [0,enemy1max],[100,0])
-    // const lostHP2:MotionValue<number> = useTransform(enemyhp2, [0,enemy2max],[100,0])
-    // const lostHP3:MotionValue<number> = useTransform(enemyhp3, [0,enemy3max],[100,0])
-    // console.log(sceneState, ";saldfkjs;ldfkj;sldfkj;saldkfj")
+    // const [enemy1, setEnemy1] = useState<JSX.Element[]|null>(null)
+    // const [enemy2, setEnemy2] = useState<JSX.Element[]|null>(null)
+    // const [enemy3, setEnemy3] = useState<JSX.Element[]|null>(null)
+    // const enemyhp1:MotionValue = motionValue(enemy1Selector.hp) 
+    // const enemyhp2:MotionValue = motionValue(enemy2Selector.hp) 
+    // const enemyhp3:MotionValue = motionValue(enemy3Selector.hp) 
+    const [MaxHp, setMaxHp] = useState<Array<number>>([]);
+
+    const enemyArr = [<Genkiman/>,<Hentaiyou/>]
+    let enemycomponents:Array<JSX.Element|null> = [null, null, null]
     useEffect(()=>{
         socket.on("screenSwitch", (data)=>{
-            setIsEncount(true)
+            // setIsEncount(true)
             console.log("entounttttttttttt")
             
             setSceneState(appearedScene);
-            // const nullOr1:number = Math.floor(Math.random()*4)
-            // const nullOr2:number = Math.floor(Math.random()*4)
-            // const nullOr3:number = Math.floor(Math.random()*4)
-            // setEnemy1(nullOr1===2?randomize(enemyArr):null)
-            // setEnemy2(nullOr2===2?randomize(enemyArr):null)
-            // setEnemy3(nullOr3===2?randomize(enemyArr):null)
             
-            // if(nullOr1===2&&nullOr2===2&&nullOr3===2)setEnemy2(randomize(enemyArr));
-            
-            fetch("https://node-final-project3-server.vercel.app/enemy/create", {
+            fetch("http://localhost:8080/enemy/create", {
                 method:"GET",
                 headers: {"Content-Type":"application/json"} 
             }).then(async response=>{
@@ -99,142 +100,151 @@ function Battle({socket}:socketType) {
                     else if(response.status === 404)setError("user doesnot exist")
                     else setError("Something went wrong :<")
                 }else{
-                    const data = await response.json();
-                    // console.log(data)
-                    setEnemy1(enemyArr.filter(e=>e.type.name === data.enemy1.name))
-                    createEnemyDispatch(createEnemy1(data.enemy1))
-                    setEnemy1max(data.enemy1.hp)
-                    setEnemy2(enemyArr.filter(e=>e.type.name === data.enemy2.name))
-                    createEnemyDispatch(createEnemy2(data.enemy2))
-                    setEnemy2max(data.enemy2.hp)
-                    setEnemy3(enemyArr.filter(e=>e.type.name === data.enemy3.name))
-                    createEnemyDispatch(createEnemy3(data.enemy3))
-                    setEnemy3max(data.enemy3.hp)
+                    const data:Array<enemyStatusType> = await response.json();
+                    // console.log(data, "these are enemies")
+                    // const enemyInsideCompos:Array<JSX.Element|null> = data.map((each,i)=>{
+                    //     const one = enemyArr.filter(e=>e.type.name === each.name)
+                    //     enemyDispatches[i](each);
+                    //     return one
+                    // })
+
+                    data.forEach((enemy,i)=>{
+                        enemyDispatches[i](enemy)
+                        setMaxHp((pre)=>[...pre, enemy.hp])
+                    })
+
+                    
+                    // setEnemy1(enemyArr.filter(e=>e.type.name === data.enemy1.name))
+                    // createEnemyDispatch(createEnemy1(data.enemy1))
+                    // setEnemy1max(data.enemy1.hp)
+                    // enemies=
+                    
+                    // setEnemy2(enemyArr.filter(e=>e.type.name === data.enemy2.name))
+                    // createEnemyDispatch(createEnemy2(data.enemy2))
+                    // setEnemy2max(data.enemy2.hp)
+
+                    // setEnemy3(enemyArr.filter(e=>e.type.name === data.enemy3.name))
+                    // createEnemyDispatch(createEnemy3(data.enemy3))
+                    // setEnemy3max(data.enemy3.hp)
                     
                 }
             })
         })
 
-        socket.on("backSwitch", (data)=>{
-            setBackScreen(true);
-        })
+        
     },[socket])
 
-    useEffect(()=>{enemy1max=enemy1Selector.hp},[enemy1])
-    useEffect(()=>{enemy2max=enemy2Selector.hp},[enemy2])
-    useEffect(()=>{enemy3max=enemy3Selector.hp},[enemy3])
+    // useEffect(()=>{enemy1max=enemy1Selector.hp},[enemy1])
+    // useEffect(()=>{enemy2max=enemy2Selector.hp},[enemy2])
+    // useEffect(()=>{enemy3max=enemy3Selector.hp},[enemy3])
     
-    useEffect(()=>{
+    useNonInitialEffect(()=>{
         setDialog(appearDialog);
     },[sceneState === appearedScene])
 
     const [startover, setStartover] = useState(0)
-    useEffect(()=>{
+
+    useNonInitialEffect(()=>{
         setDialog(yourturnDialog);
     },[sceneState === yourTurnScene])
-    let [pre, setPre] = useState(0);
-    let [ll ,setLl] = useState(1);
-    useEffect(()=>{
-        const attackNum = Math.floor(Math.random()*4)
-        let enemyName = "";
-        
-        if(ll===2){
 
-            // enemyName = enemy1Selector.name
-            // setEnemy1at(true)
-            // console.log("jjkjkjkj")
-            if(attackNum === 1){
-                enemyName = enemy1Selector.name
-                setEnemy1at(true)
-                createEnemyDispatch(getAttackFromEnemy({attack:enemy1Selector.at}))
-                setPre(1)
-                setStartover(1)
-            }else if(attackNum === 2){
-                enemyName = enemy2Selector.name
-                setEnemy2at(true)
-                createEnemyDispatch(getAttackFromEnemy({attack:enemy2Selector.at}))
-                setPre(1)
-                setStartover(1)
-            }else{
-                enemyName = enemy3Selector.name
-                setEnemy3at(true)
-                createEnemyDispatch(getAttackFromEnemy({attack:enemy3Selector.at}))
-                setPre(1)
-                setStartover(1)
-            }
-            setDialog(enemyName+enemyDialog)
-        }
+    const enemyControll = useAnimationControls()
+    useNonInitialEffect(()=>{
+        const ramdom = Math.floor(Math.random()*3)
+        enemyControll.start({
+            scale:[2,2,2,1,1],
+            rotate:[0,0,50,-50,0]
+        }).then(()=>{
+            getAttackFromEnemy({attack:enemySelectors[ramdom].at})
+        }).then(()=>{
+            setSceneState(yourTurnScene)
+        })
 
-        setLl(2)
     },[sceneState===enemiesTurnScene])
 
-    // useMotionValueEvent(dragY, "change", ()=>{
-    //     console.log(dragY.get(), "kore")
-    //     if(dragY.get()<400){
-    //         console.log("attck")
+    // useNonInitialEffect(()=>{
+    //     if(whichEnemyAt===0){
+    //         createEnemyDispatch(atackEnemy1({atack:userAt}))
+    //     }else if(whichEnemyAt===1){
+    //         createEnemyDispatch(atackEnemy2({atack:userAt}))
+    //     }else if(whichEnemyAt===2){
+    //         createEnemyDispatch(atackEnemy3({atack:userAt}))
     //     }
-    // })
-
-    useEffect(()=>{
-        if(pre===1){
-
-            setEnemy1at(false)
-            setPre(0)
-            setLl(1)
-            
-            setEnemy2at(false)
-            setEnemy3at(false)
-            setSceneState(2);
-            setDialog(yourturnDialog)
-            setEnemyDragState(0)
-            setStartover(0)
-        }
-    },[startover===1])
+    // },[sceneState === yourActionScene])
 
 
-    useEffect(()=>{
+
+    // useNonInitialEffect(()=>{
+    //     const attackNum = Math.floor(Math.random()*4)
+    //     let enemyName = "";
+        
+        
+
+    //         if(attackNum === 1){
+    //             enemyName = enemy1Selector.name
+                
+    //             createEnemyDispatch(getAttackFromEnemy({attack:enemy1Selector.at}))
+                
+    //             setStartover(1)
+    //         }else if(attackNum === 2){
+    //             enemyName = enemy2Selector.name
+
+    //             createEnemyDispatch(getAttackFromEnemy({attack:enemy2Selector.at}))
+                
+    //             setStartover(1)
+    //         }else{
+    //             enemyName = enemy3Selector.name
+
+    //             createEnemyDispatch(getAttackFromEnemy({attack:enemy3Selector.at}))
+                
+    //             setStartover(1)
+    //         }
+    //         setDialog(enemyName+enemyDialog)
+        
+
+       
+    // },[sceneState===enemiesTurnScene])
+
+
+    // useNonInitialEffect(()=>{
+    //         setSceneState(2);
+    //         setDialog(yourturnDialog)
+    //         setEnemyDragState(0)
+    //         setStartover(0)
+    // },[startover===1])
+
+    const isDefeatAll = enemySelectors.every(function(enemy){
+        return enemy.hp<=0
+    })
+
+    useNonInitialEffect(()=>{
         setSceneState(7)
-    },[enemy1Selector.hp<=0&&enemy2Selector.hp<=0&&enemy3Selector.hp<=0])
-
-    useEffect(()=>{
         socket.emit("back", "backback")
-    },[sceneState===7&&enemy1Selector.hp<=0&&enemy2Selector.hp<=0&&enemy3Selector.hp<=0])
-    console.log(userselector.status.hp, "this is players hp")
-    // const stateChanger = ()=>{
-    //     if(sceneState<2){
-    //         setSceneState(sceneState+1);
-    //     }
-    //     // console.log("statechange")
-    // }
-    const variant = {
-        hidden:{
-           
-        },
-        show:{
-            x:[-1600,400,0,0,0],
-            scale:[0.7,0.7,0.7,0.4,1]
-        },
-        back:{
-            x:[0,400,0,0,-1600],
-            scale:[0.7,0.7,0.7,0.4,1]
-        }
-    }
+    },[isDefeatAll])
 
-    let enemyArr = [<Genkiman/>,<Hentaiyou/>]
-    console.log(enemy1at)
-    const randomize=(myArray:JSX.Element[])=> {
-        return myArray[Math.floor(Math.random() * myArray.length)];
-    }
-    // console.log(enemy1Selector, enemy2Selector, enemy3Selector)
-    // console.log(dragX.get(),dragY.get())
+
+    // console.log(isDefeatAll, "isdefeatall")
+
+    // useNonInitialEffect(()=>{
+    // },[sceneState===7&&enemy1Selector.hp<=0&&enemy2Selector.hp<=0&&enemy3Selector.hp<=0])
+    
+    // const variant = {
+    //     hidden:{
+           
+    //     },
+    //     show:{
+    //         x:[-1600,400,0,0,0],
+    //         scale:[0.7,0.7,0.7,0.4,1]
+    //     },
+    //     back:{
+    //         x:[0,400,0,0,-1600],
+    //         scale:[0.7,0.7,0.7,0.4,1]
+    //     }
+    // }
+    
     return ( 
 
         <>
-            
-            
-            
-               
-
                     <motion.div 
                         transition = {sceneState===enemiesTurnScene?{
                                 times:[0,0.5,0.6,0.7, 1],duration:0.5, delay:2
@@ -245,6 +255,54 @@ function Battle({socket}:socketType) {
                         className={styles.innnerBattleBox}>
 
                         <div className={styles.enemeyField}>
+                            
+                            {enemySelectors.map((enemy,i)=>{
+                                const enemyCompo = enemyArr.filter(e=>e.type.name === enemy.name)
+                                return <motion.div animate={enemy.hp===0?{opacity:0}:{opacity:1}}>
+                                    <div>{enemy.hp}</div>
+                                    <div style={{display:"flex",justifyContent:"space-between", width:400, height:40,}}>
+                                        <div className={styles.enemyName}>{enemy.name}</div>
+                                        <div style={{
+                                            display:"flex",
+                                            justifyContent:"center",
+                                            alignItems:"center",
+                                            
+                                            width:"60%",
+                                            height:"70%",
+                                            background:`linear-gradient(to left, black ${(1-enemy.hp/MaxHp[i])*100}%, red ${(1-enemy.hp/MaxHp[i])*100}% ${enemy1Selector.hp/MaxHp[i]*100}%)`,
+                                            borderRadius:"10px",
+                                            border:"solid white 5px"
+                                    }}></div>
+                                    </div>
+                                    <motion.div animate={enemyControll}>
+                                        {enemyCompo}
+                                    </motion.div>
+                                </motion.div>
+                            })}
+
+                            
+                            
+                            {/* <motion.div>
+                                    <div>{enemySelectors[0].hp}</div>
+                                    <div style={{display:"flex",justifyContent:"space-between", width:400, height:40,}}>
+                                        <div className={styles.enemyName}>{enemySelectors[0].name}</div>
+                                        <div style={{
+                                        display:"flex",
+                                        justifyContent:"center",
+                                        alignItems:"center",
+                                        
+                                        width:"60%",
+                                        height:"70%",
+                                        background:`linear-gradient(to left, black ${(1-enemySelectors[0].hp/20)*100}%, red ${(1-enemySelectors[0].hp/20)*100}% ${enemy1Selector.hp/20*100}%)`,
+                                        borderRadius:"10px",
+                                        border:"solid white 5px"
+                                    }}></div>
+                                    </div>
+                                    <motion.div>
+                                        {enemyArr}
+                                    </motion.div>
+                                </motion.div> */}
+                            
                             {/* <motion.div className={styles.fieldEach} 
                                 animate={enemy1Selector.hp<=0?{opacity:0}:{opacity:1}}
                                 transition={{}}
@@ -349,6 +407,7 @@ function Battle({socket}:socketType) {
                                 enemyDragState={(d)=>setEnemyDragState(d)}
                                 childSceneState = {(s)=>setSceneState(s)}
                                 startover = {startover}
+                                enemyAttackNum = {(n)=>setWhichEnemyAt(n)}
                             ></HP>
                         </div>
                         

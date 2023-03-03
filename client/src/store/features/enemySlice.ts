@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-type enemyStatusType = {
+export type enemyStatusType = {
     name:string,
     hp:number, 
     at:number

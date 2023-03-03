@@ -205,6 +205,10 @@ export class GamePanel{
             this.socket.emit("encount", "hit");
             this.gameState = this.battleScene;
         }
+
+        this.socket.on("backSwitch", (data)=>{
+            this.gameState = this.fieldScene
+        })
         
         requestAnimationFrame(this.gameloop.bind(this)); 
     }
