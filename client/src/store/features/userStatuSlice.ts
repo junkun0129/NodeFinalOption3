@@ -39,10 +39,13 @@ export const userStatusSlice = createSlice({
         },
         restoreHP:(state, action:PayloadAction<{hp:number}>)=>{
             state.status.hp = action.payload.hp
+        },
+        getExp:(state, action:PayloadAction<{exp:number}>)=>{
+            state.status.exp+= action.payload.exp
         }
     }
 })
 
 export default userStatusSlice.reducer;
-export const {createUser, getAttackFromEnemy, restoreHP} = userStatusSlice.actions
+export const {createUser, getAttackFromEnemy, restoreHP, getExp} = userStatusSlice.actions
 

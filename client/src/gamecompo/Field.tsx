@@ -16,6 +16,8 @@ function Field({socket}:socketType) {
     const canvasRef = useRef<HTMLCanvasElement|null>(null);
     const [game, setGame] = useState<GamePanel|null>(null)
     const [isEncount, setIsEncount] = useState<boolean>(false);
+
+    
     useEffect(()=>{
         const canvas = canvasRef.current;
         if(!canvas)return;

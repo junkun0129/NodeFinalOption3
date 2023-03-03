@@ -11,6 +11,7 @@ import Login from './mainroutes/Login'
 import Home from './mainroutes/Home'
 import env from 'ts-react-dotenv'
 import { useNonInitialEffect } from './customhooks/useNonInitialEffect'
+import EnemiesManage from './admincompo/EnemiesManage'
 
 export interface ServerToClientEvents {
   screenSwitch:(hit:string)=>void;
@@ -38,6 +39,7 @@ function App() {
         <Route path='/game' element = {<Game socket = {socket}></Game>}></Route>
         <Route path = "/signup" element = {<Signup></Signup>}></Route>
         <Route path = "/login" element = {<Login></Login>}></Route>
+        <Route path = "/admin/enemies" element = {<EnemiesManage></EnemiesManage>}></Route>
       </Routes>
     </BrowserRouter>
 

@@ -14,6 +14,10 @@ const enemySchema = new Schema({
     at:{
         type:Number,
         required:true
+    },
+    exp:{
+        type:Number,
+        required:true
     }
 })
 

@@ -3,11 +3,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 export type enemyStatusType = {
     name:string,
     hp:number, 
-    at:number
+    at:number,
+    exp:number
     
 
 }
-const initialState:enemyStatusType = {name:"",hp: 0, at:0}
+const initialState:enemyStatusType = {name:"",hp: 0, at:0, exp:0}
 
 //enemy1
 export const enemy1Slice = createSlice({
@@ -17,7 +18,9 @@ export const enemy1Slice = createSlice({
         createEnemy1:(state, action:PayloadAction<enemyStatusType>)=>{
             state.name = action.payload.name,
             state.hp=action.payload.hp,
-            state.at=action.payload.at
+            state.at=action.payload.at,
+            state.exp = action.payload.exp
+
         },
         atackEnemy1:(state, action:PayloadAction<{atack:number}>)=>{
             state.hp=state.hp-action.payload.atack
@@ -39,7 +42,8 @@ export const enemy2Slice = createSlice({
         createEnemy2:(state, action:PayloadAction<enemyStatusType>)=>{
             state.name = action.payload.name,
             state.hp=action.payload.hp,
-            state.at=action.payload.at
+            state.at=action.payload.at,
+            state.exp = action.payload.exp
         },
         atackEnemy2:(state, action:PayloadAction<{atack:number}>)=>{
             state.hp=state.hp-action.payload.atack
@@ -61,7 +65,8 @@ export const enemy3Slice = createSlice({
         createEnemy3:(state, action:PayloadAction<enemyStatusType>)=>{
             state.name = action.payload.name,
             state.hp=action.payload.hp,
-            state.at=action.payload.at
+            state.at=action.payload.at,
+            state.exp = action.payload.exp
         },
         atackEnemy3:(state, action:PayloadAction<{atack:number}>)=>{
             state.hp=state.hp-action.payload.atack

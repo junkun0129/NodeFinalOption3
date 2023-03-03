@@ -25,11 +25,8 @@ function HP({dialog, sceneState, dragX, dragY, dragState, enemyDragState, childS
     const mxHp = useAppSelector(state=>state.reducer.userStatusReducer.status.maxmumHp)
     const playerAT = useAppSelector(state=>state.reducer.userStatusReducer.status.at)
     const dispatch = useAppDispatch();
-    const motionHP = useMotionValue(hp);
     const sceneStateMotionValue = useMotionValue(sceneState);
     
-    console.log(mxHp, ";lkj;lkj;l")
-    //drag status
     let [dragStatus, setDragStatus] = useState(0);
     const [dragEndPosition, setDragEndPosition] = useState(0);
     const dragEndX= useMotionValue(0);
@@ -51,19 +48,12 @@ function HP({dialog, sceneState, dragX, dragY, dragState, enemyDragState, childS
     let Y = useMotionValue(0);
 
     let [clicked, setClicked] = useState(0);
-    // const rote = useMotionValue(0);
-
     
-    const [ishenge, setIshenge] = useState(false);
     const dialogOpacity = useTransform(
     sceneStateMotionValue, 
     [0  ,1,2,3  ,4,5  ,0],
     [0,0.8,0,0,0.8,0,0.8]
     )
-    
-    // useEffect(()=>{
-    //     maxhp = hp;
-    // },[])
 
     useNonInitialEffect(()=>{
         console.log("droped")
@@ -124,10 +114,6 @@ function HP({dialog, sceneState, dragX, dragY, dragState, enemyDragState, childS
         // console.log()
     } )
    
-    // const HpTranform:MotionValue<number> = useTransform(motionHP, [0, maxhp], [0, 100])
-    // const theOtherSide = useTransform(motionHP, [0,maxhp], [100,0])
-    // // console.log(sceneState, "scene state")
-    // console.log(dragStatus, "drag status")
     useEffect(()=>{
         dragState(dragStatus)
     },[dragStatus])
@@ -135,7 +121,7 @@ function HP({dialog, sceneState, dragX, dragY, dragState, enemyDragState, childS
     const attackAnimeControl = useAnimationControls()
 
     useNonInitialEffect(()=>{
-        console.log("clicked")
+        
             attackAnimeControl.start({
                 width:200,
                 height:200,
@@ -151,7 +137,15 @@ function HP({dialog, sceneState, dragX, dragY, dragState, enemyDragState, childS
             height:"240px"
         })
     },[sceneState===4])
+
+    useNonInitialEffect(()=>{
+        attackAnimeControl.start({
+            
+        })
+    },[sceneState===5])
    
+
+    //attack to enemy
     useNonInitialEffect(()=>{
 
         attackAnimeControl.start({
@@ -171,17 +165,9 @@ function HP({dialog, sceneState, dragX, dragY, dragState, enemyDragState, childS
                 dispatch(atackEnemy3({atack:playerAT}))
             }
         }).then(()=>{
-            // attackAnimeControl.start({
-            //     width:"100%",
-            //     height:"240px"
-            // })
-            console.log("whole world")
             setDragStatus(0);
-            childSceneState(4)
+            // childSceneState(4)
         })
-        // .then(()=>{
-
-        // })
         
     },[dragEndPosition])
 
@@ -221,41 +207,23 @@ function HP({dialog, sceneState, dragX, dragY, dragState, enemyDragState, childS
         }
     },[dragStatus])
 
-    console.log(dragEndPosition, ";lkj")
+    const changeState=()=>{
+        if(sceneState===1){
+            childSceneState(2)
+        }else if(sceneState===3){
+            childSceneState(4)
+        }else if(sceneState===4){
+            childSceneState(5)
+        }else if(sceneState===5){
+            childSceneState(6)
+        }else if(sceneState===6){
+            childSceneState(2)
+        }else if(sceneState===7){
+            childSceneState(8)
+        }
+    }
 
 
-
-    
-    // let positions = useMotionValue("relative");
-    // let toppn = useMotionValue(1);
-    // let [kk, setKk] = useState(1)
-    // let [jj, setJj] = useState(1);
-    // useMotionValueEvent(rote, "animationComplete", ()=>{
-    //     if(kk===1){
-    //     console.log("anime ends ")
-    //         childSceneState(3)
-    //         setKk(2);
-    //         setJj(3)
-    //     }
-        
-    // })
-
-    // useMotionValueEvent(toppn, "animationComplete", ()=>{
-    //     if(jj>2){
-    //         console.log("jumbiii")
-    //         childSceneState(4)
-    //     }
-        
-    // })
-
-    // useEffect(()=>{
-    //     setDragStatus(0)
-    //     setDragEndPosition(0)
-    // },[startover===1])
-
-    
-    
-    // console.log(dragEndPosition, "dragendposition")
     return ( 
         <>
             <motion.div 
@@ -269,38 +237,20 @@ function HP({dialog, sceneState, dragX, dragY, dragState, enemyDragState, childS
                     setDragStatus(0)
                 }}
                 onDrag = {(event, info)=>{
-                    // console.log(info.point.x, info.point.y)
                     dragX(info.point.x)
                     dragY(info.point.y)
                     X.set(info.point.x)
                     Y.set(info.point.y)
                     
                 }}
-                onClick={()=>setClicked(clicked++)}
+                onClick={()=>changeState()}
                 animate={attackAnimeControl}
                 
                 // transition={dragEndPosition === enemy1Position || dragEndPosition === enemy2Position || dragEndPosition === enemy3Position
                 // ?{duration:2, times:[0,0.3,0.4,0.8,1]}
                 // :{duration:1,stiffness:50,damping:10, type:"spring"}}
                 style={{position:"relative",width:"100%", height:"240px", border:"10px solid white",borderRadius:"20px", boxSizing:"border-box", background: `linear-gradient(to left, black ${(1-hp/mxHp)*100}%, lime ${(1-hp/mxHp)*100}% ${hp/mxHp*100}%)`}}>
-                
-
-                {/* <motion.div style={{width:`${HpTranform}%`, height:"100%",backgroundColor:"lime"}}
-                            transition={{duration:1,stiffness:50,damping:10, type:"spring"}}
-                            animate = {sceneState === 2 && dragStatus === attackMode?{
-                                width:"100%",
-                                height:`100%`,
-                                borderRadius:"100px",
-                                
-                            }:sceneState === 2&&{
-                                width:"100%",
-                                height:`20%`,
-                                borderRadius:"100px",
-                               
-                            }}   
-                >
-                </motion.div> */}
-         
+                         
                 <motion.div
                     style={{position:"absolute",top:"0px",opacity:dialogOpacity,zIndex:"100",backgroundColor:"black",width:"100%", height:"100%" }}
                 ></motion.div>
