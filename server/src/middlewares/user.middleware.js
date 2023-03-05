@@ -1,23 +1,27 @@
-const User =require("../model/User")
-const Status = require("../model/UserStatus")
+const User = require("../model/User");
+const Status = require("../model/UserStatus");
 
+const userSave = async ({ name, level, at, exp, hp }) => {
+  console.log(name);
+  const user = await User.findOne({ name });
 
-const userSave = async({name,level,at, exp, hp})=>{
-    const user = await User.find({name}).populate(
-        "status"
-    )
+  const status = await Status.findOne({ _id: user.status });
 
-    await user.override({
-        status:{
-            level,
-            exp,
-            hp,
-            at
-        }
-    })
+  console.log(status, ";lkj");
 
-    return await user.save()
+  await status.overwrite({
+    level,
+    exp,
+    hp,
+    maxmumHp: hp,
+    at,
+  });
 
+  await console.log(status, "saved user");
 
+  return await status.save();
+};
 
-}
+module.exports = {
+  userSave,
+};

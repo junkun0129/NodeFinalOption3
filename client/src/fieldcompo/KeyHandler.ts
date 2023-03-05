@@ -49,7 +49,7 @@ export class Keyhandler{
                     //menu indicator
                     if(e.key === "s"){
 
-                        if(this.gp.ui.menuNumber<5){
+                        if(this.gp.ui.menuNumber<6){
 
                             this.gp.ui.menuNumber++;
                             console.log("menuNum"+this.gp.ui.menuNumber);
@@ -97,12 +97,17 @@ export class Keyhandler{
                         }
                     }
 
-
+                    if(this.gp.ui.menuNumber===5){
+                        if(e.key==="e"){
+                            this.gp.sound[1].playMusic();
+                            this.gp.gameState = this.gp.saveScene;
+                        }
+                    }
 
                     
 
                     //select close on menu
-                    if(this.gp.ui.menuNumber === 5){
+                    if(this.gp.ui.menuNumber === 6){
                         if(e.key === "e"){
                             this.gp.sound[1].playMusic();
                             this.gp.gameState = this.gp.fieldScene;
@@ -210,12 +215,50 @@ export class Keyhandler{
                                 this.gp.sound[1].playMusic();
                                 this.gp.gameState = this.gp.menuScene;
                                 this.gp.ui.makesureWaite = 0;
+
                             }
                         }
                     }
 
 
                     
+                }
+
+                //save screen
+                if(this.gp.gameState===this.gp.saveScene){
+                    if(e.key==="a"){
+                        this.gp.ui.makesureNum = 1;
+                        this.gp.sound[0].playMusic();
+                        console.log(this.gp.ui.makesureNum)
+                    }
+
+                    if(e.key==="d"){
+                        this.gp.ui.makesureNum = 2;
+                        this.gp.sound[0].playMusic()
+                        console.log(this.gp.ui.makesureNum)
+                    }
+
+                    if(this.gp.ui.makesureNum===1){
+                        if(e.key==="e"){
+                            if(this.gp.ui.makesureWaite>50){
+                                this.gp.sound[1].playMusic();
+                                this.gp.ui.makesureWaite=0;
+                                console.log(";lkj")
+                                this.gp.socket.emit("save", "save");
+                            }
+                        }
+                        
+                    }
+                    if(this.gp.ui.makesureNum===2){
+                        if(e.key==="e"){
+                            if(this.gp.ui.makesureWaite>50){
+                                this.gp.sound[1].playMusic();
+                                this.gp.gameState = this.gp.menuScene;
+                                console.log(this.gp.gameState)
+                                this.gp.ui.makesureWaite=0;
+                            }
+                        }
+                    }
                 }
 
                 //talk

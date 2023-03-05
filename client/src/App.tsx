@@ -16,6 +16,7 @@ import EnemiesManage from './admincompo/EnemiesManage'
 export interface ServerToClientEvents {
   screenSwitch:(hit:string)=>void;
   backSwitch:(backback:string)=>void;
+  save:(save:string)=>void
 }
 
 export interface ClientToServerEvents {
@@ -23,6 +24,7 @@ export interface ClientToServerEvents {
   oi:(input:string)=>void;
   encount:(encount:string)=>void;
   back:(backback:string)=>void;
+  save:(save:string)=>void;
 }
 // const url:string = process.env.SERVER_URL; 
 

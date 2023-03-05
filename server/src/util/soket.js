@@ -29,6 +29,11 @@ module.exports = (http)=>{
             }
         })
 
+        socket.on("save",(data)=>{
+            console.log(data, "rthis")
+            socket.emit("save", "save")
+        })
+
 
     })
     

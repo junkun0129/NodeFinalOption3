@@ -54,6 +54,12 @@ export class UI{
             this.drawDialog(c);
         }
 
+        //save
+        if(this.gp.gameState=== this.gp.saveScene){
+            this.makesureWaite++;
+            this.drawSavemenu(c);
+        }
+
 
         
     }
@@ -67,12 +73,12 @@ export class UI{
         if(this.gp.gameState !== this.gp.itemViewSecne){
 
             c.fillStyle = "black";
-            c.fillRect(menuX,menuY,300,500);
+            c.fillRect(menuX,menuY,350,600);
     
             c.strokeStyle = "white";
             c.lineJoin = "bevel";
             c.lineWidth = 15;
-            c.strokeRect(menuX, menuY, 300,500)
+            c.strokeRect(menuX, menuY, 350,600)
             
             c.fillStyle = "white";
             c.font = "40px monospace";
@@ -80,7 +86,8 @@ export class UI{
             c.fillText("Item", menuX+80, menuY+170)
             c.fillText("Equipments", menuX+80, menuY+260)
             c.fillText("StartOver", menuX+80, menuY+350)
-            c.fillText("Close", menuX+80, menuY+440)
+            c.fillText("Save", menuX+80, menuY+440)
+            c.fillText("Close", menuX+80, menuY+530)
         }
 
 
@@ -93,6 +100,7 @@ export class UI{
             case 3: c.fillText("▶", menuX+30, menuY+260); break;
             case 4: c.fillText("▶", menuX+30, menuY+350); break;
             case 5: c.fillText("▶", menuX+30, menuY+440); break;
+            case 6: c.fillText("▶", menuX+30, menuY+530); break;
         }
 
         
@@ -282,9 +290,41 @@ export class UI{
         c.fillStyle = "white"
         c.font = "100px monospace";
         c.fillText("iwataniiiiiiii",100,100);
-
-        
     }
 
+
+    drawSavemenu(c:CanvasRenderingContext2D){
+        let x = 500;
+        let y = 300;
+
+        c.fillStyle = "black";
+        c.fillRect(this.gp.screenWidth/2-x/2,this.gp.screenHeight/2-y/2,x,y)
+
+        c.strokeStyle = "white";
+        c.lineJoin = "bevel";
+        c.lineWidth = 6;
+        c.strokeRect(this.gp.screenWidth/2-x/2,this.gp.screenHeight/2-y/2,x,y);
+
+        c.fillStyle = "white"
+        c.font = "30px monospace";
+        c.fillText("You want to save?", x+70, y-10);
+
+        c.font = "40px monospace";
+        c.fillText("YES", x+110, y+110);
+        c.fillText("NO", x+330, y+110);
+
+        c.strokeStyle = "white";
+        c.lineJoin = "bevel";
+        c.lineWidth = 4;
+
+        if(this.makesureNum === 1){
+
+            c.strokeRect(570,360,140,70);
+            this.makesureWaite
+        }
+        if(this.makesureNum === 2){
+
+            c.strokeRect(780,360,140,70)
+        }    }
     
 }

@@ -21,7 +21,7 @@ const reducer = combineReducers({
     enemy1Reducer,
     enemy2Reducer,
     enemy3Reducer,
-    userStatusReducer 
+    userStatusReducer
 })
 
 const persistedReducer = persistReducer(persisConfig, reducer)

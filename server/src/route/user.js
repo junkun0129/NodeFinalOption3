@@ -1,3 +1,5 @@
 const router = require("express").Router();
-const controller = reqire("../controller/user.controller")
+const controller = require("../controller/user.controller")
 router.post(("/save"),controller.saveUserController)
+
+module.exports = router;
