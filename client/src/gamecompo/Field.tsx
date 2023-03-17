@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import styles from "./Field.module.scss";
 import { useNonInitialEffect } from "../customhooks/useNonInitialEffect";
 import { useAppSelector } from "../store/store";
+import reuseValue from "../reuseValue";
 
 export type socketType = {
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
@@ -35,7 +36,7 @@ function Field({ socket }: socketType) {
   useEffect(() => {
     socket.on("save", (data) => {
       console.log(data, "this is back you");
-      fetch("http://localhost:8080/user/save", {
+      fetch(`${reuseValue.serverURL}/user/save`, {
         method: "POST",
         body: JSON.stringify({
           name: user.name,

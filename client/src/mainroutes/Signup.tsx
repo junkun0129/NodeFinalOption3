@@ -2,6 +2,7 @@ import * as React from "react";
 import { Component } from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import reuseValue from "../reuseValue";
 
 function Signup() {
   const [email, setEmail] = useState("");
@@ -20,7 +21,7 @@ function Signup() {
     setError("");
     console.log(JSON.stringify({ email, name, password }));
 
-    fetch("http://localhost:8080/auth/signup", {
+    fetch(`${reuseValue.serverURL}/auth/signup`, {
       method: "POST",
       body: JSON.stringify({ email, password, name }),
       headers: { "Content-Type": "application/json" },

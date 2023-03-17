@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Component, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import reuseValue from "../reuseValue";
 import { createUser } from "../store/features/userStatuSlice";
 import { useAppDispatch, useAppSelector } from "../store/store";
 function Login() {
@@ -17,7 +18,7 @@ function Login() {
     setIsSubmit(true);
     setError("");
     console.log({ email, password }, "this is it");
-    fetch("http://localhost:8080/auth/signin", {
+    fetch(`${reuseValue.serverURL}/auth/signin`, {
       method: "POST",
       body: JSON.stringify({ email, password }),
       headers: { "Content-Type": "application/json" },

@@ -35,6 +35,7 @@ import {
 } from "../store/features/userStatuSlice";
 import { enemyStatusType } from "../store/features/enemySlice";
 import { useNonInitialEffect } from "../customhooks/useNonInitialEffect";
+import reuseValue from "../reuseValue";
 
 export type enemeyStatusType = {
   hp: number;
@@ -98,7 +99,7 @@ function Battle({ socket }: socketType) {
 
       setSceneState(appearedScene);
 
-      fetch("http://localhost:8080/enemy/create", {
+      fetch(`${reuseValue.serverURL}/enemy/create`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       }).then(async (response) => {
